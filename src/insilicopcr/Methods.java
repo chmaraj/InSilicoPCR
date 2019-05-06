@@ -326,7 +326,7 @@ public class Methods {
 		}
 		
 		for(File sampleReport : reportList) {
-			String sampleName = sampleReport.getName().split("\\.")[0];
+			String sampleName = sampleReport.getName().split("\\.tsv")[0];
 			
 			String line;
 			try {
@@ -343,10 +343,16 @@ public class Methods {
 					int actualMismatches = Integer.parseInt(fields[3]);
 					
 					if(length == weightedLength && actualMismatches <= mismatches) {
+						
 						int qstart = Integer.parseInt(fields[9]);
 						int qend = Integer.parseInt(fields[10]);
 						String sseq = fields[14];
-						sampleDict.get(sampleName).addBlastResult(sseqid, new BlastResult(sampleName, qseqid, sseqid, actualMismatches, qstart, qend, length, sseq));
+						if(sampleDict.get(sampleName).getBlastResults().containsKey(sseqid)) {
+							sampleDict.get(sampleName).addBlastResult(sseqid, new BlastResult(sampleName, qseqid, sseqid, actualMismatches, qstart, qend, length, sseq));
+						}else {
+							sampleDict.get(sampleName).addNewBlastResult(sseqid, new BlastResult(sampleName, qseqid, sseqid, actualMismatches, qstart, qend, length, sseq));
+						}
+						
 					}
 				}
 				reader.close();
@@ -374,7 +380,7 @@ public class Methods {
 				// Set up all necessary values
 				Sample sample = sampleDict.get(key);
 				String sampleName = key;
-				HashMap<String, BlastResult> blastResults = sampleDict.get(key).getBlastResults();
+				HashMap<String, ArrayList<BlastResult>> blastResults = sampleDict.get(key).getBlastResults();
 				if(!blastResults.isEmpty()) {
 					String[] primerHits = blastResults.keySet().toArray(new String[blastResults.keySet().size()]); // Similar to what we did with the degenRegex issue
 					HashMap<String, HashMap<String, ArrayList<String>>> primers = new HashMap<String, HashMap<String, ArrayList<String>>>();
@@ -425,43 +431,53 @@ public class Methods {
 									String fwdPrimer = gene + "-" + fPrimer;
 									String revPrimer = gene + "-" + rPrimer;
 									
-									// If this pair of primers are not on the same contig, skip and keep going
-									if(!sample.getBlastResults().get(fwdPrimer).getQueryID().equals(sample.getBlastResults().get(revPrimer).getQueryID())) {
-										continue;
-									}
-									
-									int startF = sample.getBlastResults().get(fwdPrimer).getStart();
-									int endF = sample.getBlastResults().get(fwdPrimer).getEnd();
-									int startR = sample.getBlastResults().get(revPrimer).getStart();
-									int endR = sample.getBlastResults().get(revPrimer).getEnd();
-									Integer[] positions = {startF, endF, startR, endR};
-									int start = Collections.min(Arrays.asList(positions));
-									int end = Collections.max(Arrays.asList(positions));
-									String location = Integer.toString(start) + "-" + Integer.toString(end);
-									String size = Integer.toString(end - start + 1);
-									String contig = sample.getBlastResults().get(gene + "-F").getQueryID();
-									String fwdMismatch = Integer.toString(sample.getBlastResults().get(fwdPrimer).getMismatch());
-									String revMismatch = Integer.toString(sample.getBlastResults().get(revPrimer).getMismatch());
-									
-									writer.write(String.join("\t", new String[] {sampleName, gene, location, size, contig, 
-											fwdPrimer, revPrimer, fwdMismatch, revMismatch}));
-									writer.write(System.getProperty("line.separator"));
-									
-									// If a qPCR probe exists, 
-									if(!primersList.get("P").isEmpty()) {
-										for(String pPrimer : primersList.get("P")) {
-											String probePrimer = gene + "-" + pPrimer;
-											int startP = sample.getBlastResults().get(probePrimer).getStart();
-											int endP = sample.getBlastResults().get(probePrimer).getEnd();
-											String locationP = Integer.toString(startP) + "-" + Integer.toString(endP);
-											String sizeP = Integer.toString(endP - startP + 1);
-											String pMismatch = Integer.toString(sample.getBlastResults().get(probePrimer).getMismatch());
+									for(BlastResult fResult : sample.getBlastResults().get(fwdPrimer)) {
+										for(BlastResult rResult : sample.getBlastResults().get(revPrimer)) {
 											
-											// Probe only valid if it is contained within the surrounding amplicon
-											if(startP > start && endP < end) {
-												writer.write(String.join("\t", new String[] {sampleName + "_probe", gene, locationP, sizeP, contig,
-														probePrimer, "N/A", pMismatch, "N/A"}));
-												writer.write(System.getProperty("line.separator"));
+											// If this pair of primers are not on the same contig, skip and keep going
+											if(!fResult.getQueryID().equals(rResult.getQueryID())) {
+												continue;
+											}
+											int startF = fResult.getStart();
+											int endF = fResult.getEnd();
+											int startR = rResult.getStart();
+											int endR = rResult.getEnd();
+											Integer[] positions = {startF, endF, startR, endR};
+											int start = Collections.min(Arrays.asList(positions));
+											int end = Collections.max(Arrays.asList(positions));
+											String location = Integer.toString(start) + "-" + Integer.toString(end);
+											String size = Integer.toString(end - start + 1);
+											String contig = fResult.getQueryID();
+											String fwdMismatch = Integer.toString(fResult.getMismatch());
+											String revMismatch = Integer.toString(rResult.getMismatch());
+											
+											writer.write(String.join("\t", new String[] {sampleName, gene, location, size, contig, 
+													fwdPrimer, revPrimer, fwdMismatch, revMismatch}));
+											writer.write(System.getProperty("line.separator"));
+											
+											// If a qPCR probe exists
+											// Still need to work on this. Marco wants the existence of a probe to signify the program is being
+											// Used for qPCR, and so the consolidated report for qPCR should only include entries where the PCR
+											// Product and the probe are both valid, and so the probe stats should be included in the same row as
+											// The general PCR report
+											if(!primersList.get("P").isEmpty()) {
+												for(String pPrimer : primersList.get("P")) {
+													String probePrimer = gene + "-" + pPrimer;
+													for(BlastResult pResult : sample.getBlastResults().get(probePrimer)) {
+														int startP = pResult.getStart();
+														int endP = pResult.getEnd();
+														String locationP = Integer.toString(startP) + "-" + Integer.toString(endP);
+														String sizeP = Integer.toString(endP - startP + 1);
+														String pMismatch = Integer.toString(pResult.getMismatch());
+														
+														// Probe only valid if it is contained within the surrounding amplicon
+														if(startP > start && endP < end) {
+															writer.write(String.join("\t", new String[] {sampleName + "_probe", gene, locationP, sizeP, contig,
+																	probePrimer, "N/A", pMismatch, "N/A"}));
+															writer.write(System.getProperty("line.separator"));
+														}
+													}
+												}
 											}
 										}
 									}
