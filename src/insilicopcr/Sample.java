@@ -8,7 +8,7 @@ public class Sample {
 	private ArrayList<String> sampleFiles = new ArrayList<String>();
 	private String name;
 	private String fileType;
-	private HashMap<String, BlastResult> blastResults = new HashMap<String, BlastResult>();
+	private HashMap<String, ArrayList<BlastResult>> blastResults = new HashMap<String, ArrayList<BlastResult>>();
 	private String assemblyFile;
 
 	public Sample() {
@@ -48,12 +48,18 @@ public class Sample {
 		this.fileType = fileType;
 	}
 	
-	public HashMap<String, BlastResult> getBlastResults(){
+	public HashMap<String, ArrayList<BlastResult>> getBlastResults(){
 		return this.blastResults;
 	}
 	
 	public void addBlastResult(String key, BlastResult results) {
-		this.blastResults.put(key, results);
+		this.blastResults.get(key).add(results);
+	}
+	
+	public void addNewBlastResult(String key, BlastResult results) {
+		ArrayList<BlastResult> temp = new ArrayList<BlastResult>();
+		temp.add(results);
+		this.blastResults.put(key, temp);
 	}
 	
 	public String getAssemblyFile() {
