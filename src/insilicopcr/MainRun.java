@@ -21,9 +21,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ComboBox;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,13 +38,13 @@ import javafx.concurrent.Task;
 
 public class MainRun extends Application {
 	
-	private final String version = "v0.100";
+	private final String version = "v0.120";
 	
 	private String sep = "/";
 	
 	private File inputFile = null, outDir = null, referenceFile = null;
 	private int threads = Runtime.getRuntime().availableProcessors();
-	private File primerDir, matchesDir, detailedDir, consolidatedDir;
+	private File detailedDir, consolidatedDir;
 	private File BBToolsLocation, BLASTLocation;
 	private int mismatches = 1;
 	private TextArea outputField;
@@ -101,44 +98,6 @@ public class MainRun extends Application {
 					DirectoryChooser chooser = new DirectoryChooser();
 					inputFile = chooser.showDialog(primaryStage);
 					inputField.setText(inputFile.getAbsolutePath());
-				}
-			}
-		});
-		
-		RadioButton faFQ = new RadioButton();
-		faFQ.setText("Input is in fastq format");
-		faFQ.setSelected(false);
-		faFQ.setAlignment(Pos.CENTER);
-		pane.add(faFQ, 13, 7, 10, 2);
-		
-		RadioButton pairedButton = new RadioButton();
-		pairedButton.setText("FastQ files are paired");
-		pairedButton.setDisable(true);
-		pairedButton.setAlignment(Pos.CENTER);
-		pane.add(pairedButton, 23, 7, 10, 2);
-		
-		isDirectory.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			public void changed(ObservableValue<? extends Boolean> b, Boolean oldVal, Boolean newVal) {
-				if(faFQ.isSelected() && newVal == true) {
-					pairedButton.setDisable(false);
-				}else {
-					pairedButton.setDisable(true);
-				}
-				if(pairedButton.isDisabled()) {
-					pairedButton.setSelected(false);
-				}
-			}
-		});
-	
-		faFQ.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			public void changed(ObservableValue<? extends Boolean> b, Boolean oldVal, Boolean newVal) {
-				if(isDirectory.isSelected() && newVal == true) {
-					pairedButton.setDisable(false);
-				}else {
-					pairedButton.setDisable(true);
-				}
-				if(pairedButton.isDisabled()) {
-					pairedButton.setSelected(false);
 				}
 			}
 		});
@@ -219,7 +178,7 @@ public class MainRun extends Application {
 		
 		ComboBox<Integer> mismatchField = new ComboBox<Integer>();
 		mismatchField.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
-		mismatchField.getItems().addAll(1, 2, 3);
+		mismatchField.getItems().addAll(0, 1, 2, 3);
 		mismatchField.getSelectionModel().selectFirst();
 		pane.add(mismatchField, 41, 15, 6, 3);
 		
@@ -243,9 +202,6 @@ public class MainRun extends Application {
 					e.consume();
 				}else if((!inputFile.isDirectory() && !Methods.verifyFastaFormat(inputFile)) || !Methods.verifyFastaFormat(referenceFile)) {
 					alertText.setText("Input and primer files must be in fasta format");
-					e.consume();
-				}else if(pairedButton.isSelected() && inputFile.isDirectory() && inputFile.listFiles().length % 2 != 0) {
-					alertText.setText("If using paired reads, ensure the input directory only contains appropriately paired reads");
 					e.consume();
 				}else {
 					if(inputFile.isDirectory()) {
@@ -281,10 +237,6 @@ public class MainRun extends Application {
 	
 	// Makes directories within the output directory
 	public void makeDirectories() {
-		primerDir = new File(outDir + sep + "primers");
-		primerDir.mkdirs();
-		matchesDir = new File(outDir + sep + "matches");
-		matchesDir.mkdirs();
 		detailedDir = new File(outDir.getAbsolutePath() + sep + "detailed_report");
 		detailedDir.mkdirs();
 		consolidatedDir = new File(outDir.getAbsolutePath() + sep + "consolidated_report");
@@ -644,6 +596,7 @@ public class MainRun extends Application {
 			
 			File file = new File(query);
 			String name = file.getName().split("_assembly\\.fasta")[0];
+			name = name.split("\\.fasta")[0];
 			File blastOutput = new File(detailedDir.getAbsolutePath() + sep + name);
 			blastOutput.mkdirs();
 			File blastTSV = new File(blastOutput.getAbsolutePath() + sep + name + ".tsv");
