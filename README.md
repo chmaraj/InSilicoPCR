@@ -9,3 +9,15 @@ In it's current state, the program can accept both fasta and fastq files within 
 This is a Java-based GUI for ease-of-use, and is packaged with the following dependencies:
 - BBTools (https://jgi.doe.gov/data-and-tools/bbtools/)
 - BLAST+ (https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
+
+# Downloading and Running
+
+Downloading and running the program is simple. Go to the releases tab in this repository and select the most recent release of the program. This release will contain two main resources: a .zip file and a .jar file. 
+
+The .zip file contains both the most recent .jar file, along with all the dependencies required to run the program. Download this file and extract it to a directory. The files contained within **MUST** be kept together, or else the program will not run correctly. 
+
+To run the program, ensure all the files from the .zip file are in the same directory, then simply double-click the .jar file. 
+
+# Updating
+
+If the version of the program you are running is not the most up-to-date version, the program will display an alert text notifying you of the option of updating. To update the program, simply go to the releases section of this repository and download the .jar file associated with the most recent release, not the .zip file. Place this .jar file in the directory containing the old program and its dependencies, then just double-click the new version. 
