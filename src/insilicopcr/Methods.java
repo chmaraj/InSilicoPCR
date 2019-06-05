@@ -1,7 +1,10 @@
 package insilicopcr;
 
+import javafx.scene.Scene;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,14 +12,25 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
+
 import java.util.Arrays;
+
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 
 public class Methods {
 	
@@ -146,8 +160,8 @@ public class Methods {
 			//Get rid of first entry from the split, it will contain nothing
 			if(!entry.isEmpty()) {
 				String[] splitEntry = entry.split("\n");
-				String id = splitEntry[0];
-				String seq = splitEntry[1];
+				String id = splitEntry[0].trim();
+				String seq = splitEntry[1].trim();
 				
 				// Put the entry into the dictionary
 				fastaDict.put(id, seq);
@@ -363,10 +377,27 @@ public class Methods {
 	}
 	
 	// Makes the final consolidated report from the multiple blast reports
-	public static void makeConsolidatedReport(File consolidatedDir, String sep, HashMap<String, Sample> sampleDict) {
+	public static void makeConsolidatedReport(File consolidatedDir, String sep, HashMap<String, Sample> sampleDict,
+			HashMap<String, String> primerDict) {
+		
+		// Check to see if this is a qPCR or a regular PCR for formatting purposes
+		boolean qPCR = false;
+		for(String key : primerDict.keySet()) {
+			if(key.split("-")[key.split("-").length - 1].startsWith("P")) {
+				qPCR = true;
+				break;
+			}
+		}
+		
 		// The header for the consolidated report
-		String header = String.join("\t", new String[] {"Sample", "Gene", "GenomeLocation", "AmpliconSize", "Contig", "ForwardPrimers", "ReversePrimers",
-				"ForwardMismatches", "ReverseMismatches"}) + "\n";
+		String header = "";
+		if(qPCR) {
+			header = String.join("\t", new String[] {"Sample", "Gene", "GenomeLocation", "AmpliconSize", "Contig", "ForwardPrimers", "ReversePrimers",
+					"ForwardMismatches", "ReverseMismatches", "Probe", "ProbeLocation", "ProbeSize", "ProbeMismatches"}) + "\n";
+		}else {
+			header = String.join("\t", new String[] {"Sample", "Gene", "GenomeLocation", "AmpliconSize", "Contig", "ForwardPrimers", "ReversePrimers",
+					"ForwardMismatches", "ReverseMismatches"}) + "\n";
+		}
 		
 		// Generate the file to be filled in
 		File consolidatedReport = new File(consolidatedDir.getAbsolutePath() + sep + "report.tsv");
@@ -419,7 +450,7 @@ public class Methods {
 								primers.get(primerName).get("P").add(direction);
 							}
 						}
-					}
+					}					
 					
 					// Check if primer pairs are present
 					for(String primerKey : primers.keySet()) {
@@ -451,33 +482,32 @@ public class Methods {
 											String fwdMismatch = Integer.toString(fResult.getMismatch());
 											String revMismatch = Integer.toString(rResult.getMismatch());
 											
-											writer.write(String.join("\t", new String[] {sampleName, gene, location, size, contig, 
-													fwdPrimer, revPrimer, fwdMismatch, revMismatch}));
-											writer.write(System.getProperty("line.separator"));
-											
 											// If a qPCR probe exists
-											// Still need to work on this. Marco wants the existence of a probe to signify the program is being
-											// Used for qPCR, and so the consolidated report for qPCR should only include entries where the PCR
-											// Product and the probe are both valid, and so the probe stats should be included in the same row as
-											// The general PCR report
-											if(!primersList.get("P").isEmpty()) {
-												for(String pPrimer : primersList.get("P")) {
-													String probePrimer = gene + "-" + pPrimer;
-													for(BlastResult pResult : sample.getBlastResults().get(probePrimer)) {
-														int startP = pResult.getStart();
-														int endP = pResult.getEnd();
-														String locationP = Integer.toString(startP) + "-" + Integer.toString(endP);
-														String sizeP = Integer.toString(endP - startP + 1);
-														String pMismatch = Integer.toString(pResult.getMismatch());
-														
-														// Probe only valid if it is contained within the surrounding amplicon
-														if(startP > start && endP < end) {
-															writer.write(String.join("\t", new String[] {sampleName + "_probe", gene, locationP, sizeP, contig,
-																	probePrimer, "N/A", pMismatch, "N/A"}));
-															writer.write(System.getProperty("line.separator"));
+											if(qPCR) {
+												if(!primersList.get("P").isEmpty()) {
+													for(String pPrimer : primersList.get("P")) {
+														String probePrimer = gene + "-" + pPrimer;
+														for(BlastResult pResult : sample.getBlastResults().get(probePrimer)) {
+															int startP = pResult.getStart();
+															int endP = pResult.getEnd();
+															String locationP = Integer.toString(startP) + "-" + Integer.toString(endP);
+															String sizeP = Integer.toString(endP - startP + 1);
+															String pMismatch = Integer.toString(pResult.getMismatch());
+															
+															// Probe only valid if it is contained within the surrounding amplicon
+															if(startP >= start && endP <= end) {
+																writer.write(String.join("\t", new String[] {sampleName, gene, location, size, contig,
+																		fwdPrimer, revPrimer, fwdMismatch, revMismatch, probePrimer, locationP,
+																		sizeP, pMismatch}));
+																writer.write(System.getProperty("line.separator"));
+															}
 														}
 													}
 												}
+											}else {
+												writer.write(String.join("\t", new String[] {sampleName, gene, location, size, contig, 
+														fwdPrimer, revPrimer, fwdMismatch, revMismatch}));
+												writer.write(System.getProperty("line.separator"));
 											}
 										}
 									}
@@ -492,10 +522,162 @@ public class Methods {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void makeQALog(File qLog, String version, File outputDir, File inputFile, File primerFile) {
+		try(FileWriter writer = new FileWriter(qLog)) {
+			String sep = System.getProperty("line.separator");
+			writer.write("In Silico PCR version: " + version);
+			writer.write(sep);
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date date = new Date();
+			writer.write("Date run: " + dateFormat.format(date));
+			writer.write(sep);
+			writer.write("Run by user: " + System.getProperty("user.name"));
+			writer.write(sep);
+			writer.write("Output Folder: " + outputDir.getAbsolutePath());
+			writer.write(sep);
+			writer.write("Primer File: " + primerFile.getAbsolutePath());
+			writer.write(sep);
+			writer.write("Input File(s) :");
+			if(inputFile.isDirectory()) {
+				for(File file : inputFile.listFiles()) {
+					writer.write(sep);
+					writer.write(file.getAbsolutePath());
+				}
+			}else {
+				writer.write(sep);
+				writer.write(inputFile.getAbsolutePath());
+			}
+			writer.close();
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static boolean checkVersion() {
+		try{
+			URL url = new URL("https://github.com/chmaraj/In_Silico_PCR/releases");
+			try{
+				URLConnection connection = url.openConnection();
+				InputStream in = connection.getInputStream();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+				String line = "";
+				int latestVersion = 0;
+				while((line = reader.readLine()) != null) {
+					if(line.contains("<a href=\"/chmaraj/In_silico_PCR/releases/tag")){
+						if(line.contains("</a>")) {
+							String version_name = line.split(">")[1];
+							version_name = version_name.split("<")[0];
+							version_name = version_name.split(" ")[version_name.split(" ").length - 1];
+							version_name = version_name.substring(1, version_name.length());
+							String[] splitVersion = version_name.split("\\.");
+							version_name = String.join("", splitVersion);
+							if(Integer.parseInt(version_name) > latestVersion) {
+								latestVersion = Integer.parseInt(version_name);
+							}
+						}
+					}
+				}
+				String currentVersion = String.join("", MainRun.version.substring(1, MainRun.version.length()).split("\\."));
+				if(Integer.parseInt(currentVersion) == latestVersion) {
+					return true;
+				}
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
+		}catch(MalformedURLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 
+	// Make a synthetic gel image of what the PCR would look like
+	public static void makeSyntheticGel(Scene scene, HashMap<String, Sample> sampleDict, File consolidatedReport) {
+		Canvas canvas = new Canvas();
+		canvas.setWidth(scene.getWidth());
+		canvas.setHeight(scene.getHeight());
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+		
+		gc.setStroke(Color.WHITE);
+		gc.setFill(Color.BLACK);
+		double laneWidth = canvas.getWidth() / 22;
+		double laneHeight = canvas.getHeight() * 8 / 10;
+		double horizontalInset = canvas.getWidth() * 1 / 20;
+		double verticalInset = (canvas.getHeight() * 2 / 10) - 20;
+		double bandWidth = 5;
+		for(int i = 0; i < 20; i++) {
+			gc.fillRect((i * laneWidth) + horizontalInset, verticalInset, laneWidth, laneHeight);
+			gc.strokeRect((i * laneWidth) + horizontalInset, verticalInset, laneWidth, laneHeight);
+		}
+		
+		double controlInset = verticalInset + (laneHeight * 2 / 10);
+		double controlHeight = laneHeight * 6 / 10;
+		
+		drawLadder(gc, horizontalInset, controlInset, controlHeight, laneWidth, bandWidth);
+		
+		gc.save();
+		gc.rotate(-90);
+		gc.setFont(new Font("Verdana", 10));
+		gc.strokeText("Ladder", -verticalInset + 3, horizontalInset + (laneWidth / 2) + 5);
+	}
+	
+	public static void drawLadder(GraphicsContext gc, double horizontalInset, double controlInset, double controlHeight, double laneWidth, double bandWidth) {
+		// Set out the max and min band heights, corresponding to 20kb and 100bp, respectively. 
+				gc.setFill(Color.WHITE);
+				gc.fillRect(horizontalInset, controlInset, laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + controlHeight, laneWidth, bandWidth);
+				
+				// Normalize control band values so they make sense
+				double band10kb = (Math.log10(10000) - 2) / 2.3;
+				double band7kb = (Math.log10(7000) - 2) / 2.3;
+				double band5kb = (Math.log10(5000) - 2) / 2.3;
+				double band4kb = (Math.log10(4000) - 2) / 2.3;
+				double band3kb = (Math.log10(3000) - 2) / 2.3;
+				double band2kb = (Math.log10(2000) - 2) / 2.3;
+				double band1_5kb = (Math.log10(1500) - 2) / 2.3;
+				double band1kb = (Math.log10(1000) - 2) / 2.3;
+				double band700 = (Math.log10(700) - 2) / 2.3;
+				double band500 = (Math.log10(500) - 2) / 2.3;
+				double band400 = (Math.log10(400) - 2) / 2.3;
+				double band300 = (Math.log10(300) - 2) / 2.3;
+				double band200 = (Math.log10(200) - 2) / 2.3;
+				
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band10kb)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band7kb)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band5kb)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band4kb)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band3kb)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band2kb)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band1_5kb)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band1kb)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band700)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band500)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band400)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band300)), laneWidth, bandWidth);
+				gc.fillRect(horizontalInset, controlInset + (controlHeight - (controlHeight * band200)), laneWidth, bandWidth);
+				
+				gc.setStroke(Color.BLACK);
+				gc.strokeText("20kb", 5, controlInset + 5);
+				gc.strokeText("10kb", 5, controlInset + (controlHeight - (controlHeight * band10kb)) + 5);
+				gc.strokeText("7kb", 5, controlInset + (controlHeight - (controlHeight * band7kb)) + 5);
+				gc.strokeText("5kb", 5, controlInset + (controlHeight - (controlHeight * band5kb)) + 5);
+				gc.strokeText("4kb", 5, controlInset + (controlHeight - (controlHeight * band4kb)) + 5);
+				gc.strokeText("3kb", 5, controlInset + (controlHeight - (controlHeight * band3kb)) + 5);
+				gc.strokeText("2kb", 5, controlInset + (controlHeight - (controlHeight * band2kb)) + 5);
+				gc.strokeText("1.5kb", 5, controlInset + (controlHeight - (controlHeight * band1_5kb)) + 5);
+				gc.strokeText("1kb", 5, controlInset + (controlHeight - (controlHeight * band1kb)) + 5);
+				gc.strokeText("700", 5, controlInset + (controlHeight - (controlHeight * band700)) + 5);
+				gc.strokeText("500", 5, controlInset + (controlHeight - (controlHeight * band500)) + 5);
+				gc.strokeText("400", 5, controlInset + (controlHeight - (controlHeight * band400)) + 5);
+				gc.strokeText("300", 5, controlInset + (controlHeight - (controlHeight * band300)) + 5);
+				gc.strokeText("200", 5, controlInset + (controlHeight - (controlHeight * band200)) + 5);
+				gc.strokeText("100", 5, controlInset + controlHeight + 5);
+	}
+	
 	// Simple method to print a message to the output TextArea
 	public static void logMessage(TextArea outputField, String msg) {
-		Platform.runLater(() -> outputField.appendText("\n##########\n" + msg + "\n##########\n"));;
+		Platform.runLater(() -> outputField.appendText("\n" + msg + "\n"));;
 	}
 		
 }
+
