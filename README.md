@@ -16,7 +16,40 @@ Downloading and running the program is simple. Go to the releases tab in this re
 
 The .zip file contains both the most recent .jar file, along with all the dependencies required to run the program. Download this file and extract it to a directory. The files contained within **MUST** be kept together, or else the program will not run correctly. 
 
-To run the program, ensure all the files from the .zip file are in the same directory, then simply double-click the .jar file. 
+To run the program, ensure all the files from the .zip file are in the same directory, then simply double-click the .jar file.
+
+### Running on cmd/terminal
+
+As of version 0.310, the program is capable of being run through command line/terminal. For Windows, proper usage is as follows:
+
+```
+
+java -cp commandpcr/commons-cli-1.4.jar;. commandpcr/Entry -i () -o () -p () \[t ()\] \[-m ()\]
+
+```
+
+And proper usage on Linux systems is as follows:
+
+```
+
+java -cp commandpcr/commons-cli-1.4.jar:. commandpcr/Entry -i () -o () -p () \[t ()\] \[-m ()\]
+
+```
+
+The options are explained here:
+
+```
+
+-i,--input <arg>        The input file/directory containing the .fasta or
+                        .fastq sequence(s)
+-m,--mismatches <arg>   The number of mismatches permitted. Default is 0.
+-o,--output <arg>       The directory to contain the output
+-p,--primers <arg>      The custom primer file containing the putative
+                        PCR primers
+-t,--threads <arg>      The number of threads to use. Default is maximum
+                        number of processors available.
+
+```
 
 # Updating
 
