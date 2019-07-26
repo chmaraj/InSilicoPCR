@@ -6,7 +6,7 @@ In it's current state, the program can accept both fasta and fastq files within 
 
 # How it works
 
-The tool works through one main pipeline, with a brief offshoot in the event of fastq input. The program works as follows:
+The tool works through one main pipeline, with an offshoot in the event of fastq input. FastQ input will cause the program to take significantly longer to complete. The program works as follows:
 
 1. Set up objects required to house and format primer and sample information. 
 2. If fastq files are used, bait the reads with primer sequences using BBDuk from BBTools suite. 
