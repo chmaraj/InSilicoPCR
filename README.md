@@ -10,11 +10,11 @@ The tool works through one main pipeline, with a brief offshoot in the event of 
 
 1. Set up objects required to house and format primer and sample information. 
 2. If fastq files are used, bait the reads with primer sequences using BBDuk from BBTools suite. 
-3. Bait the reads using the recovered reads from step 2. 
-4. Assemble retrieved reads to increase the odds of finding valid PCR products in slightly longer contigs. 
-5. Create BLAST database from the primers. 
-6. Run BLAST on primer database using either assembled reads (if fastq) or fasta sequences (if fasta). 
-7. Parse output into a consolidated report that only reports valid PCR products. 
+  - Bait the reads using the recovered reads from step 2. 
+  - Assemble retrieved reads to increase the odds of finding valid PCR products in slightly longer contigs. 
+3. Create BLAST database from the primers. 
+4. Run BLAST on primer database using either assembled reads (if fastq) or fasta sequences (if fasta). 
+5. Parse output into a consolidated report that only reports valid PCR products. 
 
 # Dependencies
 
