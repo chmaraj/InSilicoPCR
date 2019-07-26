@@ -37,7 +37,7 @@ As of version 0.310, the program is capable of being run through command line/te
 
 ```
 
-java -cp commons-cli-1.4.jar;. commandpcr/Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
+java -cp commons-cli-1.4.jar;. commandpcr.Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
 
 ```
 
@@ -45,7 +45,7 @@ And proper usage on Linux systems is as follows:
 
 ```
 
-java -cp commons-cli-1.4.jar:. commandpcr/Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
+java -cp commons-cli-1.4.jar:. commandpcr.Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
 
 ```
 
