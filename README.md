@@ -20,11 +20,11 @@ To run the program, ensure all the files from the .zip file are in the same dire
 
 ### Running on cmd/terminal
 
-As of version 0.310, the program is capable of being run through command line/terminal. Note that in the usage examples, the working directory is the **bin** directory of the release. For Windows, proper usage is as follows:
+As of version 0.310, the program is capable of being run through command line/terminal. Note that in the usage examples, the working directory is the main directory of the release, containing the dependencies and bin folder. For Windows, proper usage is as follows:
 
 ```
 
-java -cp commons-cli-1.4.jar;. commandpcr/Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
+java -cp bin/commons-cli-1.4.jar;. bin/commandpcr/Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
 
 ```
 
@@ -32,7 +32,7 @@ And proper usage on Linux systems is as follows:
 
 ```
 
-java -cp commons-cli-1.4.jar:. commandpcr/Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
+java -cp bin/commons-cli-1.4.jar:. bin/commandpcr/Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
 
 ```
 
