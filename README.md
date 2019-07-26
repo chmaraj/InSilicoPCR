@@ -4,6 +4,18 @@ The *In Silico* PCR tool is intended as a means of identifying primer binding an
 
 In it's current state, the program can accept both fasta and fastq files within the same input directory if the user desires. However, you cannot currently input both fasta and fastq files for the same sample name. i.e. if you have a sample named SampleX, you can have one or two SampleX.fastq files (single or paired), and you can have a SampleX_assembly.fasta file, but you cannot have both SampleX.fastq and SampleX.fasta files. 
 
+# How it works
+
+The tool works through one main pipeline, with a brief offshoot in the event of fastq input. The program works as follows:
+
+1. Set up objects required to house and format primer and sample information. 
+2. If fastq files are used, bait the reads with primer sequences using BBDuk from BBTools suite. 
+3. Bait the reads using the recovered reads from step 2. 
+4. Assemble retrieved reads to increase the odds of finding valid PCR products in slightly longer contigs. 
+5. Create BLAST database from the primers. 
+6. Run BLAST on primer database using either assembled reads (if fastq) or fasta sequences (if fasta). 
+7. Parse output into a consolidated report that only reports valid PCR products. 
+
 # Dependencies
 
 This is a Java-based GUI for ease-of-use, and is packaged with the following dependencies:
