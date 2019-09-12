@@ -67,3 +67,7 @@ The options are explained here:
 # Updating
 
 If the version of the program you are running is not the most up-to-date version, the interface will display an alert text notifying you of the option of updating. If you only use the GUI, you can simply go to the releases section of this repository and download the .jar file associated with the most recent release, not the .zip file. Place this .jar file in the directory containing the old program and its dependencies, then just double-click the new version. 
+
+# Known Bugs/Issues
+
+- Calling the program in terminal from a directory that is not in the direct path to the In Silico PCR program will cause a crash. For instance, if the program is contained in the home directory, calling the java program while in a separate media directory will cause the program to crash. This appears to be a problem with the 'user.dir' system property used to identify the location of the program dependencies.
