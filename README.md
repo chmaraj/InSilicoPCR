@@ -70,4 +70,4 @@ If the version of the program you are running is not the most up-to-date version
 
 # Known Bugs/Issues
 
-- Calling the program in terminal from a directory that is not in the direct path to the In Silico PCR program will cause a crash. For instance, if the program is contained in the home directory, calling the java program while using a separate media directory as the current working directory will cause the program to crash. This appears to be a problem with the 'user.dir' system property used to identify the location of the program dependencies.
+- Program crashes after the BLAST step if multiple fasta format files are provided for a single sample. For example, if there are files named Sample.fasta and Sample.fna, the program will crash after completing the BLAST step.
