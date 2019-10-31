@@ -21,7 +21,7 @@ The tool works through one main pipeline, with an offshoot in the event of fastq
 This is a Java-based GUI for ease-of-use, and is packaged with the following dependencies:
 - BBTools (https://jgi.doe.gov/data-and-tools/bbtools/)
 - BLAST+ (https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
-- Apache Commons CLI (https://commons.apache.org/proper/commons-cli/)
+- Apache Commons CLI (https://commons.apache.org/proper/commons-cli/)(prior to v0.410)
 
 # Downloading and Running
 
@@ -33,11 +33,11 @@ To run the program, ensure all the files from the .zip file are in the same dire
 
 ### Running on cmd/terminal
 
-As of version 0.310, the program is capable of being run through command line/terminal. Note that in the usage examples, the working directory is the **bin** directory of the release. For Windows, proper usage is as follows:
+As of version 0.410, the program jar is capable of being run through command line/terminal as well as GUI. Note that in the usage examples, the working directory is the directory where the release was extracted to. For Windows, proper usage is as follows:
 
 ```
 
-java -cp commons-cli-1.4.jar;. commandpcr.Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
+InSilicoPCR_windows_java_runtime/bin/java.exe -jar InSilicoPCR_v0_410_win.jar -i input(s) -o outputdir -p primerfile [t number] [-m number]
 
 ```
 
@@ -45,14 +45,14 @@ And proper usage on Linux systems is as follows:
 
 ```
 
-java -cp commons-cli-1.4.jar:. commandpcr.Entry -i input(s) -o outputdir -p primerfile [t number] [-m number]
+./InSilicoPCR_linux_java_runtime/bin/java -jar InSilicoPCR_v0_410_linux.jar -i input(s) -o outputdir -p primerfile [t number] [-m number]
 
 ```
 
 The options are explained here:
 
 ```
-
+-h,--help <arg>         Print help message and usage
 -i,--input <arg>        The input file/directory containing the .fasta or
                         .fastq sequence(s)
 -m,--mismatches <arg>   The number of mismatches permitted. Default is 0.
