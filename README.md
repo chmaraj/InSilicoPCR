@@ -27,13 +27,13 @@ This is a Java-based GUI for ease-of-use, and is packaged with the following dep
 
 Downloading and running the program is simple. Go to the releases tab in this repository and select the most recent release of the program. This release will contain two main resources: a .zip file and a .jar file. 
 
-The .zip file contains both the most recent .jar file, along with all the dependencies required to run the program. Download this file and extract it to a directory. The files contained within **MUST** be kept together, or else the program will not run correctly. 
+The .zip file contains both the most recent .jar file, a java runtime environment, a .bat or .sh file depending on operating system, and all the dependencies required to run the program. Download this file and extract it to a directory. The files contained within **MUST** be kept together, or else the program will not run correctly. 
 
-To run the program, ensure all the files from the .zip file are in the same directory, then simply double-click the .jar file.
+To run the program, ensure all the files from the .zip file are in the same directory, then simply double-click the .bat or .sh file.
 
 ### Running on cmd/terminal
 
-As of version 0.410, the program jar is capable of being run through command line/terminal as well as GUI. Note that in the usage examples, the working directory is the directory where the release was extracted to. For Windows, proper usage is as follows:
+As of version 0.410, the program jar is capable of being run through command line/terminal as well as GUI. Note that in the usage examples, the working directory is the directory where the release was extracted to. Adjust the .jar file version as needed. For Windows, proper usage is as follows:
 
 ```
 
@@ -66,7 +66,7 @@ The options are explained here:
 
 # Updating
 
-If the version of the program you are running is not the most up-to-date version, the interface will display an alert text notifying you of the option of updating. If you only use the GUI, you can simply go to the releases section of this repository and download the .jar file associated with the most recent release, not the .zip file. Place this .jar file in the directory containing the old program and its dependencies, then just double-click the new version. 
+If you only use the GUI, you can simply go to the releases section of this repository and download the .jar file associated with the most recent release, not the .zip file. Place this .jar file in the directory containing the old program and its dependencies, then edit the .bat or .sh file to incorporate the correct jar version. I.e. if the original file was InSilicoPCR_v0_410_win.jar, and the new file is InSilicoPCR_v0_411_win.jar, then the you will have to adjust the corresponding file name in the .bat or .sh file to reflect this shift. Once this is done, you can once again simply double click the .bat or .sh file. 
 
 # Known Bugs/Issues
 
