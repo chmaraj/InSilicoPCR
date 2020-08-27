@@ -21,7 +21,7 @@ The tool works through one main pipeline, with an offshoot in the event of fastq
 This is a Java-based GUI for ease-of-use, and is packaged with the following dependencies:
 - BBTools (https://jgi.doe.gov/data-and-tools/bbtools/)
 - BLAST+ (https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download)
-- Apache Commons CLI (https://commons.apache.org/proper/commons-cli/)(prior to v0.410)
+- Apache Commons CLI (https://commons.apache.org/proper/commons-cli/) (prior to v0.410)
 
 # Downloading and Running
 
