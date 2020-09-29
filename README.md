@@ -66,7 +66,7 @@ The options are explained here:
 
 # Updating
 
-If you only use the GUI, you can simply go to the releases section of this repository and download the .jar file associated with the most recent release, not the .zip file. Place this .jar file in the directory containing the old program and its dependencies, then edit the .bat or .sh file to incorporate the correct jar version. I.e. if the original file was InSilicoPCR_v0_410_win.jar, and the new file is InSilicoPCR_v0_411_win.jar, then the you will have to adjust the corresponding file name in the .bat or .sh file to reflect this shift. Once this is done, you can once again simply double click the .bat or .sh file. 
+If you only use the GUI, you can simply go to the releases section of this repository and download the .jar file associated with the most recent release, not the .zip file. Place this .jar file in the directory containing the old program and its dependencies, then edit the .bat(windows) or .sh(linux) file to incorporate the correct jar version. I.e. if the original file was InSilicoPCR_v0_410_win.jar, and the new file is InSilicoPCR_v0_411_win.jar, then the you will have to adjust the corresponding file name in the .bat or .sh file to reflect this shift. Once this is done, you can once again simply double click the .bat(windows) file or run the .sh(linux) file. 
 
 # Known Bugs/Issues
 
