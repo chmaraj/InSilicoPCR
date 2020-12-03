@@ -2,6 +2,14 @@
 	-fx-alignment: center;
 }
 
+.prompt {
+	-fx-font-family: Ariel;
+}
+
+.text {
+	-fx-font-family: Ariel;
+}
+
 .root {
 	
 }
