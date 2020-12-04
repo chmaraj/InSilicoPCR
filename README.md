@@ -45,7 +45,7 @@ And proper usage on Linux systems is as follows:
 
 ```
 
-./InSilicoPCR_linux_java_runtime/bin/java -jar InSilicoPCR_v0_410_linux.jar -i input(s) -o outputdir -p primerfile [t number] [-m number]
+./jdk-15.0.1/bin/java -jar InSilicoPCR_v0_410_linux.jar -i input(s) -o outputdir -p primerfile [t number] [-m number]
 
 ```
 
