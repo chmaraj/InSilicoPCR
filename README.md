@@ -71,4 +71,4 @@ If you only use the GUI, you can simply go to the releases section of this repos
 # Known Bugs/Issues
 
 - Program crashes after the BLAST step if multiple fasta format files are provided for a single sample. For example, if there are files named Sample.fasta and Sample.fna, the program will crash after completing the BLAST step.
-- Currently there is a problem with permissions when using the custome java runtime environment in Linux. It is unknown if this is a version problem or an issue with the custom runtime itself, so for now the current release is being distributed with the full jdk-15. This does unfortunately bloat the file size, but it does appear to work.
+- Currently there is a problem with permissions when using the custom java runtime environment in Linux. It is unknown if this is a version problem or an issue with the custom runtime itself, so for now the current release is being distributed with the full jdk-15. This does unfortunately bloat the file size, but it does appear to work.
