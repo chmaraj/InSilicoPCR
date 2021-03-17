@@ -4,6 +4,8 @@ The *In Silico* PCR tool is intended as a means of identifying primer binding an
 
 In it's current state, the program can accept both fasta and fastq files within the same input directory if the user desires. However, you cannot currently input both fasta and fastq files for the same sample name. i.e. if you have a sample named SampleX, you can have one or two SampleX.fastq files (single or paired), and you can have a SampleX_assembly.fasta file, but you cannot have both SampleX.fastq and SampleX.fasta files. 
 
+The *In Silico* PCR tool is inspired by the insilicopcr pipeline outlined here: https://github.com/duceppemo/in_silico_PCR
+
 # How it works
 
 The tool works through one main pipeline, with an offshoot in the event of fastq input. FastQ input will cause the program to take significantly longer to complete. The program works as follows:
